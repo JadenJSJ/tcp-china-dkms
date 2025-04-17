@@ -9,13 +9,13 @@ Modifications are simple: Always keep using fast mode of `TCP_AFRICA`
 This is yet another demostration of how easily we can increase TCP sending speed
 from the server side if you ignore fairness and friendliness.
 
-WARNING: DO NOT USE THIS MODULE!
+WARNING: DO NOT USE THIS MODULE! \
 It is unfair to other users if your connection is shared!
 
-Moddified to support Linux 4.7+
+Moddified to support Linux 4.7+ \
 Tested working on 6.6.72 LTS & 6.13.11
 
-Original supports Linux 2.6 - 4.6
+Original supports Linux 2.6 - 4.6 \
 https://github.com/madeye/tcp_china/
 
 How to build & install on Arch Linux based system:
