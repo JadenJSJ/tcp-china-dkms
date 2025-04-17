@@ -1,7 +1,11 @@
 *.cmd
 .tmp_versions/
+pkg/
+src/
 Module.symvers
 *.ko
 *.o
 *.mod.c
 modules.order
+tcp_china-dkms-*.pkg.tar.zst
+notes.txt

@@ -1,0 +1,30 @@
+post_install() {
+  # Trigger DKMS build for all installed kernels
+  dkms install tcp_china/${pkgver} --force
+  echo ">>> DKMS module tcp_china installed."
+  echo ">>> You may need to load it manually:"
+  echo "    sudo modprobe tcp_china"
+  echo ">>> To make it the default congestion control (does not persist over reboots):"
+  echo "    sudo sysctl -w net.ipv4.tcp_congestion_control=china"
+  echo ">>> Consult Arch Wiki for making sysctl settings persistent."
+}
+
+post_upgrade() {
+  # DKMS usually handles upgrades automatically via hooks,
+  # but forcing can sometimes resolve issues if hooks failed.
+  dkms install tcp_china/${pkgver} --force
+  echo ">>> DKMS module tcp_china upgraded."
+  echo ">>> Check if module is loaded (modprobe tcp_china) and sysctl settings if needed."
+}
+
+pre_remove() {
+  # Unload the module before removing files
+  echo ">>> Unloading module tcp_china if loaded..."
+  modprobe -r tcp_china >/dev/null 2>&1 || true # Ignore errors if not loaded and always return success
+  # DKMS hook handles removal from /usr/src and module tree
+}
+
+post_remove() {
+  echo ">>> DKMS module tcp_china removed."
+  echo ">>> Remember to change net.ipv4.tcp_congestion_control if it was set to 'china'."
+}

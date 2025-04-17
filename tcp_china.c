@@ -138,35 +138,45 @@ static void tcp_china_init(struct sock *sk)
 	tcp_china_reset(ca);
 }
 
-static void tcp_china_rtt_calc(struct sock *sk, u32 num_acked, s32 rtt_us)
+// Updated function signature and implementation
+static void tcp_china_rtt_calc(struct sock *sk, const struct ack_sample *sample)
 {
-	struct china *ca = inet_csk_ca(sk);
-	u32 rtt, artt, minrtt;
+    struct china *ca = inet_csk_ca(sk);
+    u32 rtt, artt, minrtt;
+    s32 rtt_us = sample->rtt_us; // Get RTT from the sample structure
 
-	rtt = rtt_us + 1; /* Never allow zero rtt */
+    // Check if the RTT sample is valid (-1 indicates not available)
+    if (rtt_us < 0)
+        return; // No valid RTT measurement in this ACK
 
-	minrtt = ca->minrtt;
-	artt = ca->artt;
+    rtt = rtt_us + 1; /* Never allow zero rtt */
 
-	/* Get the smallest RTT seen. This is the assumed propogation delay. */
-	if (rtt < minrtt || minrtt == 0)
-		minrtt = rtt;
+    minrtt = ca->minrtt;
+    artt = ca->artt;
 
-	/* Get the average RTT so far. This is tha assumed propogation delay
-	 * + queueing delay.
-	 */
-	if (artt > 0)
-		/* Find the exponentially smoothed average RTT.
-		 * Using avg RTT = 7/8 avg RTT + 1/8 new RTT
-		 * for speed, like in tcp_rtt_estimator.
-		 */
-		artt += (rtt >> 3) - (artt >> 3);
-	else
-		/* We don't have an average yet. */
-		artt = rtt;
+    /* Get the smallest RTT seen. This is the assumed propogation delay. */
+    if (rtt < minrtt || minrtt == 0)
+        minrtt = rtt;
 
-	ca->artt = artt;
-	ca->minrtt = minrtt;
+    /* Get the average RTT so far. This is the assumed propogation delay
+     * + queueing delay.
+     */
+    if (artt > 0)
+        /* Find the exponentially smoothed average RTT.
+         * Using avg RTT = 7/8 avg RTT + 1/8 new RTT
+         * for speed, like in tcp_rtt_estimator.
+         */
+        artt += (rtt >> 3) - (artt >> 3);
+    else
+        /* We don't have an average yet. */
+        artt = rtt;
+
+    ca->artt = artt;
+    ca->minrtt = minrtt;
+
+    // Note: The original function signature had 'num_acked', but the function
+    // body didn't actually use it. If it were needed, you would access
+    // it via 'sample->pkts_acked'.
 }
 
 #if LINUX_VERSION_CODE < KERNEL_VERSION(3, 16, 0)

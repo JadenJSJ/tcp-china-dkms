@@ -10,3 +10,8 @@ install:
 		install tcp_china.ko /lib/modules/$(shell uname -r)/kernel/net/ipv4
 		insmod /lib/modules/$(shell uname -r)/kernel/net/ipv4/tcp_china.ko
 		depmod -a
+
+uninstall:
+    -rmmod tcp_china
+    rm -f /lib/modules/$(shell uname -r)/kernel/net/ipv4/tcp_china.ko
+    depmod -a
